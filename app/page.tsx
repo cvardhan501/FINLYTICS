@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Header } from '@/components/layout/Header';
 import { MobileNav } from '@/components/layout/MobileNav';
 import { DesktopSidebar } from '@/components/layout/DesktopSidebar';
@@ -25,14 +26,17 @@ import {
   PlusCircle,
   Trash2,
   X,
+  RefreshCw,
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/finance/calculations';
 
 export default function HomePage() {
   const { user } = useAuth();
+  const router = useRouter();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Dashboard summary state
   const [summary, setSummary] = useState<any>({
@@ -46,25 +50,42 @@ export default function HomePage() {
     upcomingObligations: [],
   });
 
-  const fetchDashboardSummary = async () => {
+  const fetchDashboardSummary = async (signal?: AbortSignal) => {
     setLoading(true);
+    setErrorMsg(null);
     try {
-      const res = await fetch('/api/dashboard/summary');
+      const res = await fetch('/api/dashboard/summary', { signal });
+      if (res.status === 401) {
+        router.push('/auth/login');
+        return;
+      }
+      if (res.status === 503) {
+        setErrorMsg('Unable to connect to database service. Please retry.');
+        setLoading(false);
+        return;
+      }
       if (res.ok) {
         const data = await res.json();
         if (data.summary) {
           setSummary(data.summary);
         }
+      } else {
+        setErrorMsg('Unable to load your financial data right now.');
       }
-    } catch (e) {
-      console.error('Error loading dashboard summary:', e);
+    } catch (e: any) {
+      if (e.name !== 'AbortError') {
+        console.error('Error loading dashboard summary:', e);
+        setErrorMsg('Unable to load your financial data right now.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchDashboardSummary();
+    const controller = new AbortController();
+    fetchDashboardSummary(controller.signal);
+    return () => controller.abort();
   }, []);
 
   const handleClearSmartAlerts = async () => {
@@ -118,6 +139,22 @@ export default function HomePage() {
 
           {/* Main Dashboard Content */}
           <main className="flex-1 p-4 md:p-6 space-y-6 max-w-4xl">
+            {errorMsg && (
+              <div className="bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900 text-amber-900 dark:text-amber-200 p-4 rounded-xl flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span>{errorMsg}</span>
+                </div>
+                <button
+                  onClick={() => fetchDashboardSummary()}
+                  className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg shadow-xs flex items-center gap-1 shrink-0"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>Retry</span>
+                </button>
+              </div>
+            )}
+
             {/* Top Greeting & Balance Card */}
             <section className="bg-[#187A4E] text-white rounded-2xl p-5 md:p-6 shadow-md relative overflow-hidden">
               <div className="absolute right-0 top-0 translate-x-4 -translate-y-4 w-40 h-40 bg-white/5 rounded-full blur-2xl pointer-events-none" />

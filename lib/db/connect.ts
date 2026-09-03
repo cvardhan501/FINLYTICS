@@ -20,33 +20,51 @@ export async function connectToDatabase(): Promise<typeof mongoose | null> {
   const MONGODB_URI = process.env.MONGODB_URI;
 
   if (!MONGODB_URI) {
-    console.warn('MONGODB_URI is not set. Running in memory / mock fallback mode where appropriate.');
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('[FINLYTICS DB] MONGODB_URI environment variable is missing.');
+    }
     return null;
   }
 
-  if (cached?.conn) {
+  // Reuse active connection if ready State is connected (1)
+  if (cached?.conn && mongoose.connection.readyState === 1) {
     return cached.conn;
   }
 
-  if (!cached?.promise) {
+  // Clear stale promise if previous attempt failed or disconnected
+  if (!cached?.promise || mongoose.connection.readyState === 0) {
     const opts = {
       bufferCommands: false,
+      serverSelectionTimeoutMS: 10000,
+      connectTimeoutMS: 10000,
+      maxPoolSize: 10,
     };
 
-    cached!.promise = mongoose.connect(MONGODB_URI, opts).then((mongooseInstance) => {
-      console.log('MongoDB connected successfully');
-      return mongooseInstance;
-    }).catch((err) => {
-      console.error('MongoDB connection error:', err);
-      cached!.promise = null;
-      return null as any;
-    });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[FINLYTICS DB] Connecting to MongoDB Atlas...');
+    }
+
+    cached!.promise = mongoose
+      .connect(MONGODB_URI, opts)
+      .then((mongooseInstance) => {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[FINLYTICS DB] Connection established successfully');
+        }
+        return mongooseInstance;
+      })
+      .catch((err) => {
+        console.error('[FINLYTICS DB] Connection failed:', err.message || err);
+        cached!.promise = null;
+        cached!.conn = null;
+        return null as any;
+      });
   }
 
   try {
     cached!.conn = await cached!.promise;
   } catch (e) {
     cached!.promise = null;
+    cached!.conn = null;
     return null;
   }
 
