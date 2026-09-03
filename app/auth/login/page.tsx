@@ -3,12 +3,13 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { Mail, Lock, ArrowRight, RefreshCcw } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -71,13 +72,21 @@ export default function LoginPage() {
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 placeholder="Enter password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full pl-9 pr-3 py-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#187A4E]"
+                className="w-full pl-9 pr-10 py-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#187A4E]"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-slate-200 transition-colors p-1"
+                title={showPassword ? 'Hide Password' : 'Show Password'}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
           </div>
 
@@ -103,21 +112,7 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="pt-2 text-center flex items-center justify-between border-t border-gray-100 dark:border-slate-800 text-xs">
-          <Link
-            href="/restore-account"
-            className="text-xs font-bold text-[#187A4E] dark:text-emerald-400 hover:underline flex items-center gap-1"
-          >
-            <RefreshCcw className="w-3 h-3" />
-            <span>Restore Previous Account</span>
-          </Link>
-
-          <Link href="/auth/register" className="font-bold text-[#187A4E] hover:underline">
-            Create Account
-          </Link>
-        </div>
-
-        <div className="text-center text-xs text-gray-500 pt-1">
+        <div className="text-center text-xs text-gray-500 pt-2 border-t border-gray-100 dark:border-slate-800">
           Don't have an account?{' '}
           <Link href="/auth/register" className="font-bold text-[#187A4E] hover:underline">
             Create Account

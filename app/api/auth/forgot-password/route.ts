@@ -12,26 +12,22 @@ export async function POST(req: NextRequest) {
     const result = forgotPasswordSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json({ error: 'Please enter a valid email' }, { status: 400 });
+      return NextResponse.json({ error: 'Please enter a valid email address' }, { status: 400 });
     }
 
     const { email } = result.data;
-    const genericResponse = NextResponse.json({
-      message: 'If an account exists for this email, a password reset link has been sent.',
-    });
-
     const db = await connectToDatabase();
+
     if (!db) {
-      // In-memory fallback
-      const { rawToken } = generateRandomToken();
-      await sendPasswordResetEmail(email, rawToken);
-      return genericResponse;
+      return NextResponse.json({ error: 'Database connection error. Please try again later.' }, { status: 503 });
     }
 
     const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
-      // Return generic message to prevent email enumeration
-      return genericResponse;
+      return NextResponse.json(
+        { error: 'No account registered with this email address. Please check your email or create an account.' },
+        { status: 404 }
+      );
     }
 
     // Invalidate prior reset tokens for user
@@ -49,11 +45,17 @@ export async function POST(req: NextRequest) {
     });
 
     // Send email via Resend API
-    await sendPasswordResetEmail(user.email, rawToken);
+    const emailResult = await sendPasswordResetEmail(user.email, rawToken);
 
-    return genericResponse;
+    if (!emailResult.success) {
+      return NextResponse.json({ error: emailResult.message || 'Failed to send password reset email' }, { status: 500 });
+    }
+
+    return NextResponse.json({
+      message: 'Password reset link sent to your email successfully!',
+    });
   } catch (error: any) {
     console.error('Forgot password error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error. Failed to process request.' }, { status: 500 });
   }
 }
