@@ -141,8 +141,8 @@ export default function RestoreAccountPage() {
       <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
         {/* Header Branding */}
         <div className="text-center space-y-1.5">
-          <div className="w-12 h-12 rounded-xl bg-[#187A4E] text-white mx-auto flex items-center justify-center font-extrabold text-xl shadow-xs">
-            F
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto overflow-hidden shadow-md border border-gray-100 dark:border-slate-800">
+            <img src="/logo.png" alt="FINLYTICS Logo" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-xl font-extrabold text-gray-900 dark:text-white pt-2">
             Restore Previous Account

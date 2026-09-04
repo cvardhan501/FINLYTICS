@@ -144,8 +144,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return (
       <div className="min-h-screen bg-[#F8FAF9] dark:bg-slate-950 flex flex-col items-center justify-center p-4 text-center">
         <div className="space-y-4 animate-pulse">
-          <div className="w-16 h-16 rounded-2xl bg-[#187A4E] text-white flex items-center justify-center font-extrabold text-2xl shadow-lg mx-auto">
-            FIN
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto overflow-hidden shadow-lg border border-gray-100 dark:border-slate-800">
+            <img src="/logo.png" alt="FINLYTICS Logo" className="w-full h-full object-contain" />
           </div>
           <div className="space-y-1">
             <h1 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">
