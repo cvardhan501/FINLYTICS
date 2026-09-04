@@ -115,3 +115,41 @@ export const logBookEntrySchema = z.object({
   linkedLoanId: z.string().optional(),
   isPrivate: z.boolean().default(true),
 });
+
+export const assetSchema = z.object({
+  name: z.string().min(1, 'Asset name is required'),
+  type: z.enum([
+    'cash',
+    'bank',
+    'upi',
+    'investment',
+    'gold',
+    'property',
+    'vehicle',
+    'money_given',
+    'other',
+  ]),
+  amount: z.number().positive('Amount must be greater than 0'),
+  date: z.string().or(z.date()).optional(),
+  notes: z.string().optional(),
+  attachment: z.string().optional(),
+  loanId: z.string().optional().nullable(),
+});
+
+export const liabilitySchema = z.object({
+  name: z.string().min(1, 'Liability name is required'),
+  type: z.enum([
+    'money_borrowed',
+    'credit_card',
+    'personal_loan',
+    'vehicle_loan',
+    'education_loan',
+    'other',
+  ]),
+  amount: z.number().positive('Amount must be greater than 0'),
+  date: z.string().or(z.date()).optional(),
+  notes: z.string().optional(),
+  attachment: z.string().optional(),
+  loanId: z.string().optional().nullable(),
+});
+

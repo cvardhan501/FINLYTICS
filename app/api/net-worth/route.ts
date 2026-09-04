@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db/connect';
+import { Asset } from '@/models/Asset';
+import { Liability } from '@/models/Liability';
 import { Account } from '@/models/Account';
 import { Loan } from '@/models/Loan';
 import { LoanPayment } from '@/models/LoanPayment';
@@ -15,69 +17,178 @@ export async function GET(req: NextRequest) {
     const userId = authUser.userId;
     const db = await connectToDatabase();
 
-    if (db) {
-      const userAccounts = await Account.find({ userId }).lean();
-      const userLoans = await Loan.find({ userId }).lean();
-
-      const assets: { name: string; amount: number }[] = [];
-      const liabilities: { name: string; amount: number }[] = [];
-
-      // Accounts
-      userAccounts.forEach((acc: any) => {
-        if (acc.balance >= 0) {
-          assets.push({ name: acc.name, amount: acc.balance });
-        } else {
-          liabilities.push({ name: acc.name, amount: Math.abs(acc.balance) });
-        }
-      });
-
-      // Loans given (Receivable Asset) and Loans borrowed (Payable Liability)
-      let givenRemaining = 0;
-      let borrowedRemaining = 0;
-
-      await Promise.all(
-        userLoans.map(async (l: any) => {
-          const payments = await LoanPayment.find({ loanId: l._id }).lean();
-          const totalPaid = payments.reduce((acc, p) => acc + p.amount, 0);
-          const remaining = Math.max(0, l.principal - totalPaid);
-
-          if (l.type === 'given') {
-            givenRemaining += remaining;
-          } else {
-            borrowedRemaining += remaining;
-          }
-        })
-      );
-
-      if (givenRemaining > 0) {
-        assets.push({ name: 'Money Given (Receivable)', amount: givenRemaining });
-      }
-
-      if (borrowedRemaining > 0) {
-        liabilities.push({ name: 'Money Borrowed (Payable)', amount: borrowedRemaining });
-      }
-
-      const totalAssets = assets.reduce((acc, item) => acc + item.amount, 0);
-      const totalLiabilities = liabilities.reduce((acc, item) => acc + item.amount, 0);
-      const netWorth = totalAssets - totalLiabilities;
-
+    if (!db) {
       return NextResponse.json({
-        netWorth,
-        totalAssets,
-        totalLiabilities,
-        assets,
-        liabilities,
+        netWorth: 0,
+        totalAssets: 0,
+        totalLiabilities: 0,
+        assets: [],
+        liabilities: [],
+        history: [],
+      });
+    }
+
+    // Parallel query all user-scoped financial data
+    const [userAssets, userLiabilities, userAccounts, userLoans] = await Promise.all([
+      Asset.find({ userId }).sort({ createdAt: -1 }).lean(),
+      Liability.find({ userId }).sort({ createdAt: -1 }).lean(),
+      Account.find({ userId }).lean(),
+      Loan.find({ userId }).lean(),
+    ]);
+
+    const assets: Array<{
+      id?: string;
+      name: string;
+      type: string;
+      amount: number;
+      date?: Date | string;
+      notes?: string;
+      attachment?: string;
+      isManual?: boolean;
+      loanId?: string;
+    }> = [];
+
+    const liabilities: Array<{
+      id?: string;
+      name: string;
+      type: string;
+      amount: number;
+      date?: Date | string;
+      notes?: string;
+      attachment?: string;
+      isManual?: boolean;
+      loanId?: string;
+    }> = [];
+
+    // 1. Process manually added Assets
+    userAssets.forEach((a: any) => {
+      assets.push({
+        id: a._id.toString(),
+        name: a.name,
+        type: a.type || 'other',
+        amount: Number(a.amount || 0),
+        date: a.date,
+        notes: a.notes,
+        attachment: a.attachment,
+        isManual: true,
+        loanId: a.loanId ? a.loanId.toString() : undefined,
+      });
+    });
+
+    // 2. Process manually added Liabilities
+    userLiabilities.forEach((l: any) => {
+      liabilities.push({
+        id: l._id.toString(),
+        name: l.name,
+        type: l.type || 'other',
+        amount: Number(l.amount || 0),
+        date: l.date,
+        notes: l.notes,
+        attachment: l.attachment,
+        isManual: true,
+        loanId: l.loanId ? l.loanId.toString() : undefined,
+      });
+    });
+
+    // 3. Process Accounts balances (if any exist)
+    userAccounts.forEach((acc: any) => {
+      const balance = Number(acc.balance || 0);
+      if (balance > 0) {
+        assets.push({
+          id: 'acc_' + acc._id.toString(),
+          name: acc.name,
+          type: acc.type || 'bank',
+          amount: balance,
+          isManual: false,
+        });
+      } else if (balance < 0) {
+        liabilities.push({
+          id: 'acc_' + acc._id.toString(),
+          name: acc.name,
+          type: acc.type || 'credit_card',
+          amount: Math.abs(balance),
+          isManual: false,
+        });
+      }
+    });
+
+    // 4. Process Loans & Interest (Money Given = Asset, Money Borrowed = Liability)
+    let givenOutstandingTotal = 0;
+    let borrowedOutstandingTotal = 0;
+
+    await Promise.all(
+      userLoans.map(async (loan: any) => {
+        const payments = await LoanPayment.find({ loanId: loan._id }).lean();
+        const totalPaid = payments.reduce((sum, p: any) => sum + Number(p.amount || 0), 0);
+        const remaining = Math.max(0, Number(loan.principal || 0) - totalPaid);
+
+        if (loan.type === 'given') {
+          givenOutstandingTotal += remaining;
+        } else {
+          borrowedOutstandingTotal += remaining;
+        }
+      })
+    );
+
+    if (givenOutstandingTotal > 0) {
+      assets.push({
+        id: 'loan_receivable',
+        name: 'Money Given (Receivable)',
+        type: 'money_given',
+        amount: givenOutstandingTotal,
+        isManual: false,
+      });
+    }
+
+    if (borrowedOutstandingTotal > 0) {
+      liabilities.push({
+        id: 'loan_payable',
+        name: 'Money Borrowed (Payable)',
+        type: 'money_borrowed',
+        amount: borrowedOutstandingTotal,
+        isManual: false,
+      });
+    }
+
+    const totalAssets = assets.reduce((sum, a) => sum + a.amount, 0);
+    const totalLiabilities = liabilities.reduce((sum, l) => sum + l.amount, 0);
+    const netWorth = totalAssets - totalLiabilities;
+
+    // Calculate History timeline from dated records if records exist
+    const history: Array<{ date: string; netWorth: number; assets: number; liabilities: number }> = [];
+
+    // Combine dated assets and liabilities for timeline if present
+    const allDatedItems = [
+      ...userAssets.map((a: any) => ({ date: new Date(a.date || a.createdAt), amount: Number(a.amount), type: 'asset' })),
+      ...userLiabilities.map((l: any) => ({ date: new Date(l.date || l.createdAt), amount: Number(l.amount), type: 'liability' })),
+    ].sort((a, b) => a.date.getTime() - b.date.getTime());
+
+    if (allDatedItems.length > 0) {
+      let runningAssets = 0;
+      let runningLiabilities = 0;
+      allDatedItems.forEach((item) => {
+        if (item.type === 'asset') runningAssets += item.amount;
+        if (item.type === 'liability') runningLiabilities += item.amount;
+        const dateStr = item.date.toISOString().split('T')[0];
+        history.push({
+          date: dateStr,
+          netWorth: runningAssets - runningLiabilities,
+          assets: runningAssets,
+          liabilities: runningLiabilities,
+        });
       });
     }
 
     return NextResponse.json({
-      netWorth: 0,
-      totalAssets: 0,
-      totalLiabilities: 0,
-      assets: [],
-      liabilities: [],
+      netWorth,
+      totalAssets,
+      totalLiabilities,
+      assets,
+      liabilities,
+      history,
     });
   } catch (error: any) {
+    console.error('Net Worth API error:', error);
     return NextResponse.json({ error: 'Failed to fetch net worth statement' }, { status: 500 });
   }
 }

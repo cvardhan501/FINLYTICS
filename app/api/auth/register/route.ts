@@ -44,13 +44,6 @@ export async function POST(req: NextRequest) {
         currency: currency || 'INR',
         lastLoginAt: new Date(),
       });
-
-      // Initialize default accounts for user
-      await Account.create([
-        { userId: user._id, name: 'Cash', type: 'cash', balance: 5000, currency: user.currency, isDefault: true },
-        { userId: user._id, name: 'Bank Account', type: 'bank', balance: 25000, currency: user.currency },
-        { userId: user._id, name: 'UPI Wallet', type: 'upi', balance: 2000, currency: user.currency },
-      ]);
     } else {
       // Memory fallback
       const existing = memoryUsers.find((u) => u.email === email.toLowerCase());
