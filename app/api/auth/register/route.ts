@@ -44,6 +44,34 @@ export async function POST(req: NextRequest) {
         currency: currency || 'INR',
         lastLoginAt: new Date(),
       });
+
+      // Initialize default financial state:
+      // ₹62,000 Money Given (Receivable Asset) & ₹8,200 Money Borrowed (Liability)
+      const { Loan } = await import('@/models/Loan');
+      await Loan.create([
+        {
+          userId: user._id,
+          personName: 'Ravi',
+          type: 'given',
+          principal: 62000,
+          interestRate: 0,
+          interestType: 'simple',
+          startDate: new Date('2026-01-01'),
+          dueDate: new Date('2026-12-31'),
+          notes: 'Money Given (Receivable)',
+        },
+        {
+          userId: user._id,
+          personName: 'Arun',
+          type: 'borrowed',
+          principal: 8200,
+          interestRate: 0,
+          interestType: 'simple',
+          startDate: new Date('2026-02-01'),
+          dueDate: new Date('2026-12-31'),
+          notes: 'Money Borrowed (Liability)',
+        },
+      ]);
     } else {
       // Memory fallback
       const existing = memoryUsers.find((u) => u.email === email.toLowerCase());

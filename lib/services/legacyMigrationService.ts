@@ -27,28 +27,54 @@ const seedLegacyUser = {
 };
 
 const seedLegacyData = {
-  transactions: [
-    { type: 'expense' as TransactionType, amount: 850, category: 'Food', account: 'Bank Account', paymentMethod: 'UPI', date: '2026-08-28', description: 'Legacy Grocery' },
-    { type: 'expense' as TransactionType, amount: 240, category: 'Transport', account: 'UPI Wallet', paymentMethod: 'UPI', date: '2026-08-25', description: 'Legacy Cab Ride' },
-    { type: 'income' as TransactionType, amount: 32000, category: 'Salary', account: 'Bank Account', paymentMethod: 'Direct Deposit', date: '2026-08-01', description: 'Legacy August Salary' },
-    { type: 'income' as TransactionType, amount: 5000, category: 'Freelance', account: 'Bank Account', paymentMethod: 'UPI', date: '2026-08-15', description: 'Legacy Freelance' },
-  ],
+  transactions: [] as Array<{
+    type: TransactionType;
+    amount: number;
+    category: string;
+    account: string;
+    paymentMethod: string;
+    date: string;
+    description: string;
+  }>,
   loans: [
-    { personName: 'Ravi', type: 'given' as LoanDirection, principal: 10000, interestRate: 12, interestType: 'simple' as InterestType, startDate: '2026-01-01', dueDate: '2026-09-20', notes: 'Legacy loan to Ravi' },
-    { personName: 'Arun', type: 'borrowed' as LoanDirection, principal: 20000, interestRate: 10, interestType: 'compound' as InterestType, startDate: '2026-02-01', dueDate: '2026-10-02', notes: 'Legacy loan from Arun' },
+    {
+      personName: 'Ravi',
+      type: 'given' as LoanDirection,
+      principal: 62000,
+      interestRate: 0,
+      interestType: 'simple' as InterestType,
+      startDate: '2026-01-01',
+      dueDate: '2026-12-31',
+      notes: 'Money Given (Receivable)',
+    },
+    {
+      personName: 'Arun',
+      type: 'borrowed' as LoanDirection,
+      principal: 8200,
+      interestRate: 0,
+      interestType: 'simple' as InterestType,
+      startDate: '2026-02-01',
+      dueDate: '2026-12-31',
+      notes: 'Money Borrowed (Liability)',
+    },
   ],
-  loanPayments: [
-    { personName: 'Ravi', amount: 3000, paymentDate: '2026-05-10', paymentMethod: 'UPI' },
-    { personName: 'Arun', amount: 5000, paymentDate: '2026-06-15', paymentMethod: 'UPI' },
-  ],
-  budgets: [
-    { name: 'Overall Monthly', amount: 10000, category: '' },
-    { name: 'Food', amount: 3500, category: 'Food' },
-    { name: 'Transport', amount: 2000, category: 'Transport' },
-  ],
-  logs: [
-    { title: 'August Financial Review', content: 'Legacy log: August spending was well controlled.', category: 'financial' as LogCategory, date: '2026-08-28' },
-  ],
+  loanPayments: [] as Array<{
+    personName: string;
+    amount: number;
+    paymentDate: string;
+    paymentMethod: string;
+  }>,
+  budgets: [] as Array<{
+    name: string;
+    amount: number;
+    category: string;
+  }>,
+  logs: [] as Array<{
+    title: string;
+    content: string;
+    category: LogCategory;
+    date: string;
+  }>,
 };
 
 export async function verifyLegacyCredentials(username: string, password: string): Promise<{
