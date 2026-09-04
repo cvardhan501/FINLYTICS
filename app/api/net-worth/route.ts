@@ -29,11 +29,12 @@ export async function GET(req: NextRequest) {
     }
 
     // Parallel query all user-scoped financial data
-    const [userAssets, userLiabilities, userAccounts, userLoans] = await Promise.all([
+    const [userAssets, userLiabilities, userAccounts, userLoans, userPayments] = await Promise.all([
       Asset.find({ userId }).sort({ createdAt: -1 }).lean(),
       Liability.find({ userId }).sort({ createdAt: -1 }).lean(),
       Account.find({ userId }).lean(),
       Loan.find({ userId }).lean(),
+      LoanPayment.find({ userId }).lean(),
     ]);
 
     const assets: Array<{
@@ -113,22 +114,31 @@ export async function GET(req: NextRequest) {
     });
 
     // 4. Process Loans & Interest (Money Given = Asset, Money Borrowed = Liability)
+    const paymentsByLoan = new Map<string, number>();
+    userPayments.forEach((p: any) => {
+      const lId = p.loanId.toString();
+      paymentsByLoan.set(lId, (paymentsByLoan.get(lId) || 0) + Number(p.amount || 0));
+    });
+
     let givenOutstandingTotal = 0;
     let borrowedOutstandingTotal = 0;
 
-    await Promise.all(
-      userLoans.map(async (loan: any) => {
-        const payments = await LoanPayment.find({ loanId: loan._id }).lean();
-        const totalPaid = payments.reduce((sum, p: any) => sum + Number(p.amount || 0), 0);
-        const remaining = Math.max(0, Number(loan.principal || 0) - totalPaid);
+    userLoans.forEach((loan: any) => {
+      // Exclude paid or cancelled loans from active receivables/payables
+      if (loan.status === 'paid' || loan.status === 'cancelled') {
+        return;
+      }
+      const totalPaid = paymentsByLoan.get(loan._id.toString()) || 0;
+      const remaining = Math.max(0, Number(loan.principal || 0) - totalPaid);
 
+      if (remaining > 0) {
         if (loan.type === 'given') {
           givenOutstandingTotal += remaining;
         } else {
           borrowedOutstandingTotal += remaining;
         }
-      })
-    );
+      }
+    });
 
     if (givenOutstandingTotal > 0) {
       assets.push({
