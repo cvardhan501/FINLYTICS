@@ -52,4 +52,8 @@ const AssetSchema: Schema<IAsset> = new Schema(
   { timestamps: true }
 );
 
+AssetSchema.index({ userId: 1, date: -1 });
+AssetSchema.index({ userId: 1, type: 1 });
+
 export const Asset = mongoose.models.Asset || mongoose.model<IAsset>('Asset', AssetSchema);
+

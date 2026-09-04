@@ -6,6 +6,7 @@ import { MobileNav } from '@/components/layout/MobileNav';
 import { DesktopSidebar } from '@/components/layout/DesktopSidebar';
 import { InterestCalculatorModal } from '@/components/loans/InterestCalculatorModal';
 import { AddTransactionModal } from '@/components/transactions/AddTransactionModal';
+import { AnimatedMoney } from '@/components/common/AnimatedMoney';
 import { useAuth } from '@/components/providers/AuthProvider';
 import {
   HandCoins,
@@ -306,7 +307,7 @@ export default function LoansPage() {
                   Total Given
                 </span>
                 <p className="text-lg font-extrabold text-gray-900 dark:text-white mt-1">
-                  {formatCurrency(summary.totalGiven || 0, user?.currency)}
+                  <AnimatedMoney value={summary.totalGiven || 0} currency={user?.currency} />
                 </p>
               </div>
 
@@ -315,7 +316,7 @@ export default function LoansPage() {
                   Total Received
                 </span>
                 <p className="text-lg font-extrabold text-[#187A4E] dark:text-emerald-400 mt-1">
-                  {formatCurrency(summary.totalGivenPaid || 0, user?.currency)}
+                  <AnimatedMoney value={summary.totalGivenPaid || 0} currency={user?.currency} />
                 </p>
               </div>
 
@@ -324,7 +325,7 @@ export default function LoansPage() {
                   Remaining Outstanding
                 </span>
                 <p className="text-lg font-extrabold text-amber-600 dark:text-amber-400 mt-1">
-                  {formatCurrency(summary.totalGivenRemaining || 0, user?.currency)}
+                  <AnimatedMoney value={summary.totalGivenRemaining || 0} currency={user?.currency} />
                 </p>
               </div>
             </div>
@@ -338,7 +339,7 @@ export default function LoansPage() {
                   Total Borrowed
                 </span>
                 <p className="text-lg font-extrabold text-gray-900 dark:text-white mt-1">
-                  {formatCurrency(summary.totalBorrowed || 0, user?.currency)}
+                  <AnimatedMoney value={summary.totalBorrowed || 0} currency={user?.currency} />
                 </p>
               </div>
 
@@ -347,7 +348,7 @@ export default function LoansPage() {
                   Total Paid
                 </span>
                 <p className="text-lg font-extrabold text-[#187A4E] dark:text-emerald-400 mt-1">
-                  {formatCurrency(summary.totalBorrowedPaid || 0, user?.currency)}
+                  <AnimatedMoney value={summary.totalBorrowedPaid || 0} currency={user?.currency} />
                 </p>
               </div>
 
@@ -356,7 +357,7 @@ export default function LoansPage() {
                   Remaining Outstanding
                 </span>
                 <p className="text-lg font-extrabold text-red-600 dark:text-red-400 mt-1">
-                  {formatCurrency(summary.totalBorrowedRemaining || 0, user?.currency)}
+                  <AnimatedMoney value={summary.totalBorrowedRemaining || 0} currency={user?.currency} />
                 </p>
               </div>
             </div>

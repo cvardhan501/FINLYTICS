@@ -6,6 +6,7 @@ import { MobileNav } from '@/components/layout/MobileNav';
 import { DesktopSidebar } from '@/components/layout/DesktopSidebar';
 import { AddTransactionModal } from '@/components/transactions/AddTransactionModal';
 import { useAuth } from '@/components/providers/AuthProvider';
+import { AnimatedMoney } from '@/components/common/AnimatedMoney';
 import { PieChart, Plus, AlertTriangle, CheckCircle2, ChevronRight, PlusCircle, Trash2, X } from 'lucide-react';
 import { formatCurrency } from '@/lib/finance/calculations';
 
@@ -169,8 +170,8 @@ export default function BudgetsPage() {
 
                   <div className="flex justify-between text-xs font-medium">
                     <span className="text-gray-600 dark:text-slate-400">
-                      Spent: {formatCurrency(b.spent, user?.currency)} of{' '}
-                      {formatCurrency(b.amount, user?.currency)}
+                      Spent: <AnimatedMoney value={b.spent} currency={user?.currency} /> of{' '}
+                      <AnimatedMoney value={b.amount} currency={user?.currency} />
                     </span>
                     <span className="font-bold text-gray-900 dark:text-white">{b.percentage}% used</span>
                   </div>

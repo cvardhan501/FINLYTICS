@@ -7,6 +7,7 @@ import { DesktopSidebar } from '@/components/layout/DesktopSidebar';
 import { AddTransactionModal } from '@/components/transactions/AddTransactionModal';
 import { AddAssetModal } from '@/components/net-worth/AddAssetModal';
 import { AddLiabilityModal } from '@/components/net-worth/AddLiabilityModal';
+import { AnimatedMoney } from '@/components/common/AnimatedMoney';
 import { useAuth } from '@/components/providers/AuthProvider';
 import {
   ShieldCheck,
@@ -188,12 +189,12 @@ export default function NetWorthPage() {
               ESTIMATED TOTAL NET WORTH
             </span>
             <h2 className="text-4xl font-extrabold tracking-tight">
-              {formatCurrency(data.netWorth || 0, user?.currency)}
+              <AnimatedMoney value={data.netWorth || 0} currency={user?.currency} />
             </h2>
             <div className="flex items-center justify-center gap-4 text-xs font-medium text-emerald-100 pt-2 border-t border-emerald-600/40 max-w-sm mx-auto">
-              <span>Assets: {formatCurrency(data.totalAssets || 0, user?.currency)}</span>
+              <span>Assets: <AnimatedMoney value={data.totalAssets || 0} currency={user?.currency} /></span>
               <span>•</span>
-              <span>Liabilities: {formatCurrency(data.totalLiabilities || 0, user?.currency)}</span>
+              <span>Liabilities: <AnimatedMoney value={data.totalLiabilities || 0} currency={user?.currency} /></span>
             </div>
           </div>
 
@@ -217,7 +218,7 @@ export default function NetWorthPage() {
               </div>
 
               <p className="text-2xl font-extrabold text-gray-900 dark:text-white">
-                {formatCurrency(data.totalAssets || 0, user?.currency)}
+                <AnimatedMoney value={data.totalAssets || 0} currency={user?.currency} />
               </p>
 
               {!hasAssets ? (
@@ -304,7 +305,7 @@ export default function NetWorthPage() {
               </div>
 
               <p className="text-2xl font-extrabold text-gray-900 dark:text-white">
-                {formatCurrency(data.totalLiabilities || 0, user?.currency)}
+                <AnimatedMoney value={data.totalLiabilities || 0} currency={user?.currency} />
               </p>
 
               {!hasLiabilities ? (

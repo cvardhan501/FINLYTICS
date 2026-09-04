@@ -6,6 +6,7 @@ import { MobileNav } from '@/components/layout/MobileNav';
 import { DesktopSidebar } from '@/components/layout/DesktopSidebar';
 import { AddTransactionModal } from '@/components/transactions/AddTransactionModal';
 import { useAuth } from '@/components/providers/AuthProvider';
+import { AnimatedMoney } from '@/components/common/AnimatedMoney';
 import {
   PieChart as PieIcon,
   BarChart3,
@@ -121,7 +122,7 @@ export default function AnalyticsPage() {
                 Total Expenses
               </span>
               <p className="text-lg font-extrabold text-gray-900 dark:text-white mt-1">
-                {formatCurrency(totalExpense, user?.currency)}
+                <AnimatedMoney value={totalExpense} currency={user?.currency} />
               </p>
             </div>
 
@@ -130,7 +131,7 @@ export default function AnalyticsPage() {
                 Total Income
               </span>
               <p className="text-lg font-extrabold text-[#187A4E] dark:text-emerald-400 mt-1">
-                {formatCurrency(totalIncome, user?.currency)}
+                <AnimatedMoney value={totalIncome} currency={user?.currency} />
               </p>
             </div>
 

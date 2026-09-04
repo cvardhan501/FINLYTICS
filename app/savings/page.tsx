@@ -7,6 +7,7 @@ import { DesktopSidebar } from '@/components/layout/DesktopSidebar';
 import { AddTransactionModal } from '@/components/transactions/AddTransactionModal';
 import { AddSavingsModal } from '@/components/savings/AddSavingsModal';
 import { CreateGoalModal } from '@/components/savings/CreateGoalModal';
+import { AnimatedMoney } from '@/components/common/AnimatedMoney';
 import { useAuth } from '@/components/providers/AuthProvider';
 import {
   PiggyBank,
@@ -208,7 +209,7 @@ export default function SavingsPage() {
                 Total Savings
               </span>
               <p className="text-lg font-extrabold text-[#187A4E] dark:text-emerald-400 mt-1">
-                {formatCurrency(summary.totalSavings, user?.currency)}
+                <AnimatedMoney value={summary.totalSavings} currency={user?.currency} />
               </p>
             </div>
 
@@ -217,7 +218,7 @@ export default function SavingsPage() {
                 Saved This Month
               </span>
               <p className="text-lg font-extrabold text-emerald-600 dark:text-emerald-300 mt-1">
-                {formatCurrency(summary.savedThisMonth, user?.currency)}
+                <AnimatedMoney value={summary.savedThisMonth} currency={user?.currency} />
               </p>
             </div>
 
@@ -226,7 +227,7 @@ export default function SavingsPage() {
                 Total Withdrawn
               </span>
               <p className="text-lg font-extrabold text-amber-600 dark:text-amber-400 mt-1">
-                {formatCurrency(summary.totalWithdrawn, user?.currency)}
+                <AnimatedMoney value={summary.totalWithdrawn} currency={user?.currency} />
               </p>
             </div>
 
@@ -248,7 +249,7 @@ export default function SavingsPage() {
                   Savings Balance
                 </span>
                 <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white mt-0.5">
-                  {formatCurrency(summary.totalSavings, user?.currency)}
+                  <AnimatedMoney value={summary.totalSavings} currency={user?.currency} />
                 </h2>
               </div>
 

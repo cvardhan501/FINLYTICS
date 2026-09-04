@@ -7,6 +7,7 @@ import { Header } from '@/components/layout/Header';
 import { MobileNav } from '@/components/layout/MobileNav';
 import { DesktopSidebar } from '@/components/layout/DesktopSidebar';
 import { AddTransactionModal } from '@/components/transactions/AddTransactionModal';
+import { AnimatedMoney } from '@/components/common/AnimatedMoney';
 import { useAuth } from '@/components/providers/AuthProvider';
 import {
   TrendingUp,
@@ -174,7 +175,7 @@ export default function HomePage() {
               <div>
                 <p className="text-xs font-medium text-emerald-200">Total Balance</p>
                 <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-1">
-                  {formatCurrency(totalBalance, user?.currency)}
+                  <AnimatedMoney value={totalBalance} currency={user?.currency} />
                 </h2>
               </div>
 
@@ -187,7 +188,7 @@ export default function HomePage() {
                   <div>
                     <span className="text-emerald-200 block text-[11px]">Income</span>
                     <span className="font-bold text-sm text-white">
-                      {formatCurrency(totalIncome, user?.currency)}
+                      <AnimatedMoney value={totalIncome} currency={user?.currency} />
                     </span>
                   </div>
                 </div>
@@ -199,7 +200,7 @@ export default function HomePage() {
                   <div>
                     <span className="text-emerald-200 block text-[11px]">Expenses</span>
                     <span className="font-bold text-sm text-white">
-                      {formatCurrency(totalExpense, user?.currency)}
+                      <AnimatedMoney value={totalExpense} currency={user?.currency} />
                     </span>
                   </div>
                 </div>

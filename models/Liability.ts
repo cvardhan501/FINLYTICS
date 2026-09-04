@@ -46,5 +46,9 @@ const LiabilitySchema: Schema<ILiability> = new Schema(
   { timestamps: true }
 );
 
+LiabilitySchema.index({ userId: 1, date: -1 });
+LiabilitySchema.index({ userId: 1, type: 1 });
+
 export const Liability =
   mongoose.models.Liability || mongoose.model<ILiability>('Liability', LiabilitySchema);
+
