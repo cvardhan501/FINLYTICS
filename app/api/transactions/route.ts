@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db/connect';
 import { Transaction } from '@/models/Transaction';
-import { Account } from '@/models/Account';
 import { getAuthenticatedUser } from '@/lib/auth/jwt';
 import { transactionSchema } from '@/schemas';
+import { syncAccountBalanceForTransaction } from '@/lib/finance/accountBalanceHelper';
 
 export async function GET(req: NextRequest) {
   try {
@@ -64,16 +64,20 @@ export async function POST(req: NextRequest) {
     const db = await connectToDatabase();
 
     if (db) {
+      const accountDoc = await syncAccountBalanceForTransaction(
+        userId,
+        txData.account,
+        txData.amount,
+        txData.type as 'income' | 'expense',
+        1
+      );
+
       const newTx = await Transaction.create({
         userId,
         ...txData,
+        accountId: accountDoc?._id,
         date: new Date(txData.date),
       });
-
-      if (txData.account) {
-        const balanceChange = txData.type === 'income' ? txData.amount : -txData.amount;
-        await Account.findOneAndUpdate({ userId, name: txData.account }, { $inc: { balance: balanceChange } });
-      }
 
       return NextResponse.json({ message: 'Transaction added successfully', transaction: newTx });
     }
