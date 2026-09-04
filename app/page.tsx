@@ -112,7 +112,10 @@ export default function HomePage() {
     }
   };
 
-  const totalBalance = summary.totalBalance || 0;
+  const availableMoney = summary.availableMoney ?? summary.totalBalance ?? 0;
+  const netWorth = summary.netWorth || 0;
+  const totalAssets = summary.totalAssets || 0;
+  const totalLiabilities = summary.totalLiabilities || 0;
   const totalIncome = summary.totalIncome || 0;
   const totalExpense = summary.totalExpense || 0;
   const overallBudget = summary.overallBudget;
@@ -156,7 +159,7 @@ export default function HomePage() {
               </div>
             )}
 
-            {/* Top Greeting & Balance Card */}
+            {/* Top Greeting & Financial Overview Card */}
             <section className="bg-[#187A4E] text-white rounded-2xl p-5 md:p-6 shadow-md relative overflow-hidden">
               <div className="absolute right-0 top-0 translate-x-4 -translate-y-4 w-40 h-40 bg-white/5 rounded-full blur-2xl pointer-events-none" />
 
@@ -172,37 +175,57 @@ export default function HomePage() {
                 </span>
               </div>
 
-              <div>
-                <p className="text-xs font-medium text-emerald-200">Total Balance</p>
-                <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-1">
-                  <AnimatedMoney value={totalBalance} currency={user?.currency} />
-                </h2>
-              </div>
-
-              {/* Income vs Expenses Summary */}
-              <div className="grid grid-cols-2 gap-3 mt-6 pt-4 border-t border-emerald-600/60 text-xs">
-                <div className="flex items-center gap-2.5 bg-black/10 rounded-xl p-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-300">
-                    <TrendingUp className="w-4 h-4 stroke-[2.5]" />
-                  </div>
-                  <div>
-                    <span className="text-emerald-200 block text-[11px]">Income</span>
-                    <span className="font-bold text-sm text-white">
-                      <AnimatedMoney value={totalIncome} currency={user?.currency} />
-                    </span>
-                  </div>
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                <div>
+                  <p className="text-xs font-semibold text-emerald-200 uppercase tracking-wider">Available Money (Liquid)</p>
+                  <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-1">
+                    <AnimatedMoney value={availableMoney} currency={user?.currency} />
+                  </h2>
+                  <p className="text-[11px] text-emerald-200/80 mt-1">Spendable cash, bank & wallet balances</p>
                 </div>
 
-                <div className="flex items-center gap-2.5 bg-black/10 rounded-xl p-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center text-red-300">
-                    <TrendingDown className="w-4 h-4 stroke-[2.5]" />
+                <div className="bg-black/15 backdrop-blur-sm border border-white/10 rounded-xl p-3 sm:text-right shrink-0">
+                  <span className="text-[10px] uppercase font-bold text-emerald-200 tracking-wider block">Estimated Net Worth</span>
+                  <p className="text-xl font-extrabold text-white mt-0.5">
+                    <AnimatedMoney value={netWorth} currency={user?.currency} />
+                  </p>
+                </div>
+              </div>
+
+              {/* Financial Metrics Summary */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-5 pt-4 border-t border-emerald-600/60 text-xs">
+                <div className="bg-black/10 rounded-xl p-2.5">
+                  <span className="text-emerald-200 block text-[10px] font-semibold uppercase">Total Assets</span>
+                  <span className="font-bold text-sm text-white">
+                    <AnimatedMoney value={totalAssets} currency={user?.currency} />
+                  </span>
+                </div>
+
+                <div className="bg-black/10 rounded-xl p-2.5">
+                  <span className="text-emerald-200 block text-[10px] font-semibold uppercase">Total Liabilities</span>
+                  <span className="font-bold text-sm text-white">
+                    <AnimatedMoney value={totalLiabilities} currency={user?.currency} />
+                  </span>
+                </div>
+
+                <div className="bg-black/10 rounded-xl p-2.5">
+                  <div className="flex items-center gap-1 text-emerald-200 text-[10px] font-semibold uppercase">
+                    <TrendingUp className="w-3 h-3 text-emerald-300" />
+                    <span>Income</span>
                   </div>
-                  <div>
-                    <span className="text-emerald-200 block text-[11px]">Expenses</span>
-                    <span className="font-bold text-sm text-white">
-                      <AnimatedMoney value={totalExpense} currency={user?.currency} />
-                    </span>
+                  <span className="font-bold text-sm text-white">
+                    <AnimatedMoney value={totalIncome} currency={user?.currency} />
+                  </span>
+                </div>
+
+                <div className="bg-black/10 rounded-xl p-2.5">
+                  <div className="flex items-center gap-1 text-emerald-200 text-[10px] font-semibold uppercase">
+                    <TrendingDown className="w-3 h-3 text-red-300" />
+                    <span>Expenses</span>
                   </div>
+                  <span className="font-bold text-sm text-white">
+                    <AnimatedMoney value={totalExpense} currency={user?.currency} />
+                  </span>
                 </div>
               </div>
             </section>

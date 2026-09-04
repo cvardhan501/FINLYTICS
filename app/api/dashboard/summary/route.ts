@@ -4,11 +4,9 @@ import { Transaction } from '@/models/Transaction';
 import { Budget } from '@/models/Budget';
 import { BillSubscription } from '@/models/BillSubscription';
 import { Loan } from '@/models/Loan';
-import { LoanPayment } from '@/models/LoanPayment';
 import { Notification } from '@/models/Notification';
-import { Account } from '@/models/Account';
 import { getAuthenticatedUser } from '@/lib/auth/jwt';
-import { calculateBudgetStatus } from '@/lib/finance/calculations';
+import { calculateUserFinancialSummary } from '@/lib/finance/netWorthCalculator';
 
 export async function GET(req: NextRequest) {
   const startTime = Date.now();
@@ -25,8 +23,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Database connection offline' }, { status: 503 });
     }
 
-    // Execute parallel MongoDB queries with lean projections
-    const [transactions, budgets, bills, loans, notifications, accounts] = await Promise.all([
+    // Execute parallel MongoDB queries & financial calculations
+    const [financialSummary, transactions, budgets, bills, loans, notifications] = await Promise.all([
+      calculateUserFinancialSummary(userId),
       Transaction.find({ userId })
         .select('amount type category account date description paymentMethod')
         .sort({ date: -1 })
@@ -35,7 +34,6 @@ export async function GET(req: NextRequest) {
       BillSubscription.find({ userId }).sort({ dueDate: 1 }).lean(),
       Loan.find({ userId }).sort({ dueDate: 1 }).lean(),
       Notification.find({ userId, isRead: false }).sort({ createdAt: -1 }).limit(5).lean(),
-      Account.find({ userId }).lean(),
     ]);
 
     // Income vs Expense Aggregation
@@ -46,8 +44,6 @@ export async function GET(req: NextRequest) {
     const totalExpense = transactions
       .filter((t: any) => t.type === 'expense')
       .reduce((acc, t: any) => acc + (t.amount || 0), 0);
-
-    const totalBalance = totalIncome - totalExpense;
 
     // Overall Budget Aggregation
     const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
@@ -77,27 +73,6 @@ export async function GET(req: NextRequest) {
         }
       : null;
 
-    // Net Worth Calculations
-    let assetsSum = accounts.filter((a: any) => a.balance > 0).reduce((acc, a: any) => acc + a.balance, 0);
-    let liabilitiesSum = accounts.filter((a: any) => a.balance < 0).reduce((acc, a: any) => acc + Math.abs(a.balance), 0);
-
-    // Calculate Loan remaining balances
-    await Promise.all(
-      loans.map(async (l: any) => {
-        const payments = await LoanPayment.find({ loanId: l._id }).lean();
-        const totalPaid = payments.reduce((acc, p) => acc + p.amount, 0);
-        const remaining = Math.max(0, l.principal - totalPaid);
-
-        if (l.type === 'given') {
-          assetsSum += remaining;
-        } else {
-          liabilitiesSum += remaining;
-        }
-      })
-    );
-
-    const netWorth = assetsSum - liabilitiesSum;
-
     // Upcoming Obligations
     const upcomingObligations = [
       ...bills.map((b: any) => ({
@@ -109,7 +84,7 @@ export async function GET(req: NextRequest) {
         link: '/more/bills',
       })),
       ...loans
-        .filter((l: any) => l.status !== 'paid')
+        .filter((l: any) => l.status !== 'paid' && l.status !== 'cancelled')
         .map((l: any) => ({
           id: l._id.toString(),
           title: `${l.personName} (${l.type === 'given' ? 'To Receive' : 'To Pay'})`,
@@ -124,12 +99,15 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       summary: {
-        totalBalance,
+        availableMoney: financialSummary.availableMoney,
+        totalBalance: financialSummary.availableMoney, // Alias for backward compatibility
+        netWorth: financialSummary.netWorth,
+        totalAssets: financialSummary.totalAssets,
+        totalLiabilities: financialSummary.totalLiabilities,
+        assets: financialSummary.totalAssets,
+        liabilities: financialSummary.totalLiabilities,
         totalIncome,
         totalExpense,
-        netWorth,
-        assets: assetsSum,
-        liabilities: liabilitiesSum,
         overallBudget,
         recentTransactions: transactions.slice(0, 5).map((t: any) => ({ ...t, id: t._id.toString() })),
         notifications: notifications.map((n: any) => ({ ...n, id: n._id.toString() })),
