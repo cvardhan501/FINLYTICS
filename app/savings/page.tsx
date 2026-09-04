@@ -32,6 +32,7 @@ import {
   GraduationCap,
   Gift,
   Heart,
+  Trash2,
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/finance/calculations';
 import {
@@ -123,6 +124,24 @@ export default function SavingsPage() {
     fetchSavingsData(controller.signal);
     return () => controller.abort();
   }, [typeFilter, goalFilter, sortBy, searchQuery]);
+
+  const handleDeleteTransaction = async (txId: string) => {
+    if (!txId) return;
+    if (confirm('Are you sure you want to delete this savings transaction?')) {
+      try {
+        const res = await fetch(`/api/savings/transactions/${txId}`, {
+          method: 'DELETE',
+        });
+        if (res.ok) {
+          fetchSavingsData();
+        } else {
+          alert('Failed to delete savings transaction.');
+        }
+      } catch (e) {
+        console.error('Delete savings transaction error:', e);
+      }
+    }
+  };
 
   const renderGoalIcon = (iconName?: string) => {
     switch (iconName) {
@@ -511,7 +530,8 @@ export default function SavingsPage() {
                         <th className="pb-2">Type</th>
                         <th className="pb-2">Goal</th>
                         <th className="pb-2">Payment Method</th>
-                        <th className="pb-2 pr-2 text-right">Amount</th>
+                        <th className="pb-2 text-right">Amount</th>
+                        <th className="pb-2 pr-2 text-right">Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-slate-800/60 font-medium">
@@ -522,9 +542,10 @@ export default function SavingsPage() {
                           year: 'numeric',
                         });
                         const isDeposit = tx.type === 'deposit';
+                        const txId = tx.id || tx._id;
 
                         return (
-                          <tr key={tx.id || tx._id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/40 transition-colors">
+                          <tr key={txId} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/40 transition-colors">
                             <td className="py-2.5 pl-2 text-gray-500 dark:text-slate-400 whitespace-nowrap">
                               {formattedDate}
                             </td>
@@ -555,11 +576,20 @@ export default function SavingsPage() {
                             <td className="py-2.5 text-gray-500 dark:text-slate-400">
                               {tx.paymentMethod || 'UPI'}
                             </td>
-                            <td className={`py-2.5 pr-2 text-right font-extrabold text-sm ${
+                            <td className={`py-2.5 text-right font-extrabold text-sm ${
                               isDeposit ? 'text-[#187A4E] dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
                             }`}>
                               {isDeposit ? '+ ' : '- '}
                               {formatCurrency(tx.amount, user?.currency)}
+                            </td>
+                            <td className="py-2.5 pr-2 text-right">
+                              <button
+                                onClick={() => handleDeleteTransaction(txId)}
+                                className="p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                                title="Delete Savings Transaction"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
                             </td>
                           </tr>
                         );
@@ -576,10 +606,11 @@ export default function SavingsPage() {
                       day: 'numeric',
                     });
                     const isDeposit = tx.type === 'deposit';
+                    const txId = tx.id || tx._id;
 
                     return (
                       <div
-                        key={tx.id || tx._id}
+                        key={txId}
                         className="p-3 bg-gray-50/70 dark:bg-slate-800/60 rounded-xl border border-gray-100 dark:border-slate-800 flex items-center justify-between text-xs"
                       >
                         <div className="flex items-center gap-3">
@@ -604,11 +635,21 @@ export default function SavingsPage() {
                           </div>
                         </div>
 
-                        <div className={`text-right font-extrabold text-sm ${
-                          isDeposit ? 'text-[#187A4E] dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
-                        }`}>
-                          {isDeposit ? '+ ' : '- '}
-                          {formatCurrency(tx.amount, user?.currency)}
+                        <div className="flex items-center gap-2">
+                          <div className={`text-right font-extrabold text-sm ${
+                            isDeposit ? 'text-[#187A4E] dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
+                          }`}>
+                            {isDeposit ? '+ ' : '- '}
+                            {formatCurrency(tx.amount, user?.currency)}
+                          </div>
+
+                          <button
+                            onClick={() => handleDeleteTransaction(txId)}
+                            className="p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                            title="Delete Savings Transaction"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
                       </div>
                     );
