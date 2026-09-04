@@ -12,6 +12,8 @@ export interface ISavingsGoal extends Document {
   category?: string;
   priority?: GoalPriority;
   notes?: string;
+  description?: string;
+  icon?: string;
   status: GoalStatus;
   isCompleted: boolean;
   createdAt: Date;
@@ -28,6 +30,8 @@ const SavingsGoalSchema: Schema<ISavingsGoal> = new Schema(
     category: { type: String, default: 'General' },
     priority: { type: String, enum: ['low', 'medium', 'high'], default: 'medium' },
     notes: { type: String, default: '' },
+    description: { type: String, default: '' },
+    icon: { type: String, default: 'Target' },
     status: { type: String, enum: ['active', 'completed', 'overdue'], default: 'active' },
     isCompleted: { type: Boolean, default: false },
   },

@@ -66,8 +66,8 @@ export const InstallPromptBanner: React.FC = () => {
     <div className="fixed bottom-20 left-4 right-4 md:left-auto md:right-6 md:bottom-6 z-40 max-w-sm bg-slate-900 text-white p-4 rounded-2xl shadow-2xl border border-slate-800 animate-in fade-in slide-in-from-bottom-5 duration-200">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#187A4E] text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-xs">
-            F
+          <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 shadow-xs border border-slate-800">
+            <img src="/logo.png" alt="FINLYTICS Logo" className="w-full h-full object-contain" />
           </div>
           <div>
             <h4 className="text-xs font-bold text-white">Install FINLYTICS App</h4>

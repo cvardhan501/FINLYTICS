@@ -40,6 +40,9 @@ export default function ForgotPasswordPage() {
     <div className="min-h-screen bg-[#F8FAF9] dark:bg-slate-950 flex flex-col justify-center items-center p-4">
       <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
         <div>
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 overflow-hidden shadow-md border border-gray-100 dark:border-slate-800">
+            <img src="/logo.png" alt="FINLYTICS Logo" className="w-full h-full object-contain" />
+          </div>
           <Link
             href="/auth/login"
             className="inline-flex items-center gap-1 text-xs font-semibold text-gray-500 hover:text-gray-900 dark:hover:text-slate-200 mb-4"

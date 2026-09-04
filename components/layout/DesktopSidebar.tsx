@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   Settings,
   Plus,
+  PiggyBank,
 } from 'lucide-react';
 
 interface DesktopSidebarProps {
@@ -28,6 +29,7 @@ export const DesktopSidebar: React.FC<DesktopSidebarProps> = ({ onOpenAddModal }
   const mainLinks = [
     { href: '/', label: 'Home Dashboard', icon: Home },
     { href: '/transactions', label: 'Transactions', icon: ArrowRightLeft },
+    { href: '/savings', label: 'Savings', icon: PiggyBank },
     { href: '/loans', label: 'Loans & Interest', icon: HandCoins },
     { href: '/analytics', label: 'Analytics', icon: BarChart3 },
     { href: '/more/budgets', label: 'Budgets', icon: PieChart },

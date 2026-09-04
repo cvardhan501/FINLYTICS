@@ -62,9 +62,9 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
 
             <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden shrink-0">
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden shrink-0 shadow-xs border border-gray-100 dark:border-slate-800">
                 <img
-                  src="/logo.svg"
+                  src="/logo.png"
                   alt="FINLYTICS Logo"
                   className="w-full h-full object-contain group-hover:scale-105 transition-transform"
                 />

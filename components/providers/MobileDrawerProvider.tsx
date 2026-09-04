@@ -19,6 +19,7 @@ import {
   Settings,
   X,
   ChevronRight,
+  PiggyBank,
 } from 'lucide-react';
 
 interface MobileDrawerContextType {
@@ -101,6 +102,7 @@ export const MobileDrawerProvider: React.FC<{ children: React.ReactNode }> = ({ 
     {
       title: 'SAVINGS & PLANNING',
       items: [
+        { href: '/savings', label: 'Savings & Movement', icon: PiggyBank },
         { href: '/more/savings-goals', label: 'Savings Goals', icon: Target },
         { href: '/more/recurring', label: 'Recurring Transactions', icon: Repeat },
       ],
@@ -152,8 +154,8 @@ export const MobileDrawerProvider: React.FC<{ children: React.ReactNode }> = ({ 
         {/* Drawer Header */}
         <div className="p-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between bg-gray-50/80 dark:bg-slate-900/80">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden shrink-0">
-              <img src="/logo.svg" alt="FINLYTICS" className="w-full h-full object-contain" />
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden shrink-0 shadow-xs border border-gray-100 dark:border-slate-800">
+              <img src="/logo.png" alt="FINLYTICS Logo" className="w-full h-full object-contain" />
             </div>
             <div>
               <h2 className="text-sm font-extrabold text-gray-900 dark:text-white leading-none">

@@ -32,8 +32,8 @@ export default function LoginPage() {
       <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
         {/* Header Branding */}
         <div className="text-center space-y-1.5">
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto overflow-hidden">
-            <img src="/logo.svg" alt="FINLYTICS Logo" className="w-full h-full object-contain" />
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto overflow-hidden shadow-md border border-gray-100 dark:border-slate-800">
+            <img src="/logo.png" alt="FINLYTICS Logo" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white pt-2">Welcome Back</h1>
           <p className="text-xs text-gray-500 dark:text-slate-400 font-medium">

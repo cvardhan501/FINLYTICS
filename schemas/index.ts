@@ -71,6 +71,18 @@ export const savingsGoalSchema = z.object({
   targetDate: z.string().or(z.date()),
   category: z.string().default('General'),
   notes: z.string().optional(),
+  description: z.string().optional(),
+  icon: z.string().optional(),
+});
+
+export const savingsTransactionSchema = z.object({
+  type: z.enum(['deposit', 'withdrawal']),
+  amount: z.number().positive('Amount must be greater than 0'),
+  date: z.string().or(z.date()),
+  goalId: z.string().optional().nullable(),
+  paymentMethod: z.string().default('UPI'),
+  note: z.string().optional(),
+  attachment: z.string().optional(),
 });
 
 export const recurringTransactionSchema = z.object({

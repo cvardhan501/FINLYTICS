@@ -214,13 +214,13 @@ export default function LoansPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#F8FAF9] dark:bg-slate-950 text-gray-900 dark:text-slate-100 pb-20 md:pb-6">
+    <div className="h-screen flex flex-col overflow-hidden bg-[#F8FAF9] dark:bg-slate-950 text-gray-900 dark:text-slate-100">
       <Header userName={user?.name} currency={user?.currency || 'INR'} />
 
-      <div className="max-w-6xl mx-auto flex">
+      <div className="flex-1 max-w-6xl w-full mx-auto flex overflow-hidden">
         <DesktopSidebar onOpenAddModal={() => setIsAddTransactionModalOpen(true)} />
 
-        <main className="flex-1 p-4 md:p-6 space-y-6 max-w-4xl">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 max-w-4xl pb-24 md:pb-6">
           {/* Header Bar */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
