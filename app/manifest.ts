@@ -1,0 +1,66 @@
+import type { MetadataRoute } from 'next';
+
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: 'FINLYTICS — Personal Finance',
+    short_name: 'FINLYTICS',
+    description: 'A professional personal finance manager for tracking expenses, income, budgets, loans, savings and financial goals.',
+    start_url: '/',
+    scope: '/',
+    display: 'standalone',
+    orientation: 'portrait',
+    background_color: '#F8FAF9',
+    theme_color: '#187A4E',
+    icons: [
+      {
+        src: '/icons/icon-192.png',
+        sizes: '192x192',
+        type: 'image/png',
+        purpose: 'any',
+      },
+      {
+        src: '/icons/icon-512.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'any',
+      },
+      {
+        src: '/icons/icon-maskable-512.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'maskable',
+      },
+    ],
+    shortcuts: [
+      {
+        name: 'Add Expense',
+        short_name: 'Add Expense',
+        description: 'Record a new expense or income transaction',
+        url: '/transactions',
+        icons: [{ src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' }],
+      },
+      {
+        name: 'Loans & Interest',
+        short_name: 'Loans',
+        description: 'View money given, borrowed and repayments',
+        url: '/loans',
+        icons: [{ src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' }],
+      },
+      {
+        name: 'Log Book',
+        short_name: 'Log Book',
+        description: 'Open private financial diary and notes',
+        url: '/more/logbook',
+        icons: [{ src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' }],
+      },
+      {
+        name: 'Budgets',
+        short_name: 'Budgets',
+        description: 'Check spending limits and over-budget warnings',
+        url: '/more/budgets',
+        icons: [{ src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' }],
+      },
+    ],
+    categories: ['finance', 'productivity', 'lifestyle'],
+  };
+}

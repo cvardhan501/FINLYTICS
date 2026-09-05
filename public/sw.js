@@ -1,15 +1,20 @@
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 const STATIC_CACHE_NAME = `finlytics-static-${CACHE_VERSION}`;
 const RUNTIME_CACHE_NAME = `finlytics-runtime-${CACHE_VERSION}`;
 
 const STATIC_ASSETS = [
   '/',
   '/manifest.webmanifest',
+  '/manifest.json',
   '/logo.svg',
+  '/logo.png',
+  '/fin-logo.png',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
+  '/icons/icon-maskable-512.png',
   '/icons/apple-touch-icon.png',
   '/favicon.png',
+  '/favicon.ico',
 ];
 
 // Install Event: Pre-cache static assets
